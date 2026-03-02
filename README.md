@@ -1,3 +1,5 @@
+*🌍 Read this in other languages: [English](README.md), [繁體中文](README_zh-TW.md)*
+
 # 🧠 Universal AI Long-Term Memory & Dynamic Workflow Blueprint
 
 ---
@@ -56,7 +58,7 @@ If the toolchain and workflows are the "hands and feet", this four-layer memory 
 
 ## III. Dynamic Agentic Workflow & Memory Lifecycle
 
-This framework provides not only static memory but also defines a **Dynamic Reasoning** workflow that AI Agents must follow when taking over a project. The AI should avoid rigid, one-way execution pipelines and autonomously determine when to plan, execute, debug, and memorize, following this five-phase closed loop:
+This framework provides not only static memory but also defines a **Dynamic Reasoning** workflow that AI Agents must follow when taking over a project. The AI should avoid rigid, one-way execution pipelines and autonomously determine when to plan, execute, debug, and memorize, following this five-phase closed loop (Phase 0 ~ 4):
 
 ### 0. Phase 0: Environment Audit & Initialization
 - **Trigger**: Upon taking over a project for the first time or before executing a task.
@@ -148,8 +150,17 @@ Having understood the workflow and tools, start building project memory by creat
 - Format: Date → Topic → Details
 
 ## Decision Log
-- Table format: | Date | Decision | Rationale | Result |
-- AI should prioritize reading this in new conversations
+- Each decision must include a "Minimum Structured Schema" to ensure maintainability:
+  - `Scope`: project / module / infra / security / data / user-pref
+  - `Decision`: Content and direction of the decision
+  - `Confidence`: high / medium / low (prevents treating uncertain workarounds as absolute rules)
+  - `Provenance`: Provide source code path, Commit Hash, or error log fragments for traceability
+  - `Review_after`: (Optional) Mark if this decision or workaround has an expiration or needs a revisit
+- Table format: | Date | Scope | Decision | Confidence | Provenance | Review_after |
+
+## System Security & Memory Boundaries
+- **Never write**: API Keys, Tokens, Passwords, unredacted PII (Personally Identifiable Information).
+- **Safe to write**: Hashes/Fingerprints, system variable names, or Vault/Secret Manager paths (e.g., Infisical locations).
 
 ## Roadmap
 - [ ] In-progress/To-do items
@@ -285,6 +296,12 @@ if __name__ == "__main__":
 alias sys-ask="python /path/to/project/scripts/query.py"
 ```
 
+#### 5. Retrieval Strategy Upgrades (For Production)
+To reduce noise from irrelevant context, it is highly recommended to extend `query.py` with:
+- **Hybrid Retrieval**: Combine BM25 (exact keyword match) with Vector (semantic match). In engineering, searching for specific exact variable/function names is often more precise than relying on pure semantics.
+- **Reranker**: Apply a cross-encoder reranker model to the initial Top-K results. This drastically reduces false positives when fetching across different modules.
+- **Query Router**: Dynamically route queries to different memory layers (Layer 1-4) based on the user's intent classification (e.g., Debug, Architecture, Ops, Security).
+
 ---
 
 ## VII. Layer 3: Conversation Digest Indexing
@@ -357,13 +374,20 @@ Create `.agents/workflows/end.md`:
 description: Conversation end memory persistence and evidence logging
 ---
 1. Self-Reflection: Review if any new shell scripts were created, new solutions invented, or significant bugs resolved during this session (Phase 4).
-2. Clean Workspace: Ensure all temporary rubbish inside `/tmp` is wiped.
-3. Update AGENTS.md:
-   - Condense new knowledge and solutions into the Decision Log (forming permanent habits).
+2. Memory Reconsolidation & Pruning:
+   - **Dedup**: Merge current modifications with similar past decision records.
+   - **Conflict**: If contradictory configurations are found, overwrite with the latest solution and leave a "Conflict Note".
+   - **Decay**: Archive or downgrade temporary workarounds that haven't been retrieved over a long period or have exceeded their `Review_after` date.
+3. Clean Workspace: Ensure all temporary rubbish inside `/tmp` is wiped.
+4. Update AGENTS.md:
+   - Condense new knowledge and solutions, writing them into the Decision Log following the Minimum Schema (Scope, Confidence, etc.).
    - Add current work to the Success Log.
-4. Execute Git commit + push (strictly observe Git hygiene with descriptive Commit Messages).
-5. Trigger the pre-push hook to permanently update the LanceDB vector store, and confirm memory persistence to the user.
+5. Execute Git commit + push (If a secret leak is detected, preemptive blocking like gitleaks should trigger).
+6. Trigger the pre-push hook to permanently update the LanceDB vector store, and confirm memory persistence to the user.
 ```
+
+> 💡 **Tip: Tool-Agnostic Mapping for Non-IDE Agents**
+> The essence of `/start` and `/end` is a bi-directional **State Machine**. If you are operating in an environment without automated `.agents/workflows` (e.g., self-hosted bots, pure web-based LLM chats), ensure the Agent strictly follows these phases via forced system prompts at the beginning and end of every task loop to achieve universal compatibility.
 
 ---
 
@@ -373,8 +397,17 @@ Create `.git/hooks/pre-push` to automatically update LanceDB on every push:
 
 ```bash
 #!/bin/bash
-echo "🧠 Syncing knowledge base..."
+echo "🧠 Syncing knowledge base (Incremental update)..."
+
+# Strongly recommended for production: Use git diff to calculate modified files, implementing "Incremental Indexing" instead of a full rebuild.
 python scripts/ingest.py
+
+# Protection Mechanism: If indexing fails, abort the push immediately. This guarantees code history and vector memory always remain absolutely synchronized, preventing memory fragmentation.
+if [ $? -ne 0 ]; then
+  echo "❌ Knowledge base indexing failed! Please check errors or run git push --no-verify"
+  exit 1  
+fi
+
 echo "✅ Knowledge base updated"
 ```
 
@@ -397,14 +430,27 @@ In any greenfield project, have the AI complete these in order (if existing, "Au
 
 ---
 
-## XII. Important Notes
+## XIII. Unified Memory OS (Memory API)
 
-1. **Add `.lancedb/` to `.gitignore`**: The vector store is local and does not need to be pushed.
-2. **`AGENTS.md` must be pushed**: This is the core memory across environments.
-3. **Embedding Model Selection**: `all-MiniLM-L6-v2` is lightweight and fast, suitable for most scenarios.
-4. **Incremental Indexing**: In production, track mtime/size to avoid full rebuilds.
-5. **Cross-Project Sharing**: Multi-project semantic search can be achieved through a unified Memory API.
+As projects expand, to achieve centralized management across multiple projects or multiple agents, we strongly recommend wrapping the physical states of Layer 1 (AGENTS.md) and vector data of Layer 2/3 (LanceDB) into an open, universally accessible **Memory API** interface:
+
+**API Specification Proposal**:
+- `write(memory_item)`: Normalizes and writes single decision experiences that fit the minimum Schema back to the system.
+- `query(intent, scope, text)`: Regardless of whether the frontend is Cursor, Windsurf, or CLI, automatically route and extract highly relevant snippets from the four memory layers based on Intent.
+- `consolidate()`: Periodically execute Dedup and Decay maintenance on the persistence layer in the background.
 
 ---
 
-*This guide was generated by Antigravity AI, based on real-world experience at Interaction Lab.*
+## XIV. System Evaluation Benchmarks
+
+When elevating this implementation from an "Optimization Guide" to a "System OS", it is recommended to deploy quantitative evaluation workflows to verify that this memory architecture genuinely reduces systemic errors.
+
+- **Hard Metric Suggestions**:
+  - **Repeat Error Rate**: Observe whether identical bugs resurface across different conversational turns.
+  - **Time-to-fix & Iteration Count**: Track the average number of debugging iterations required to solve an issue, validating if memory is actively assisting.
+  - **Irrelevant Retrieval Ratio**: The percentage of accurately helpful Context Snippets extracted versus noise.
+- **Testing Verification Method**: Perform historical replays (Replay Tests) using long, grueling debugging chat logs combined with Commit Logs from real past projects. Introduce a new AI Agent for a blind test to observe if it successfully avoids repeating the same pitfalls simply by inheriting this framework and memory.
+
+---
+
+*This blueprint was produced by Interaction Lab in combination with Antigravity AI's operational experience, designed to solve the collaboration pain points of next-generation AI development.*

@@ -1,3 +1,5 @@
+*🌍 Read this in other languages: [English](README.md), [繁體中文](README_zh-TW.md)*
+
 # 🧠 Universal AI Long-Term Memory Framework (全域 AI 長期記憶與動態工作流藍圖)
 
 ---
@@ -52,7 +54,7 @@
 
 ## 三、動態代理工作流與記憶生命週期 (Dynamic Agentic Workflow)
 
-本框架不只提供靜態記憶，更定義了 AI 代理 (Agent) 接手專案時應遵循的**動態決策型 (Dynamic Reasoning)** 工作流。AI 應避免死板的單向執行，並自主判斷何時規劃、執行、除錯與記憶，遵循以下五階段閉環：
+本框架不只提供靜態記憶，更定義了 AI 代理 (Agent) 接手專案時應遵循的**動態決策型 (Dynamic Reasoning)** 工作流。AI 應避免死板的單向執行，並自主判斷何時規劃、執行、除錯與記憶，遵循以下五階段閉環 (Phase 0 ~ 4)：
 
 ### 0. Phase 0: 環境稽核與初始化 (Environment Audit & Initialization)
 - **觸發時機**：首次接手專案或啟動任務前。
@@ -144,8 +146,17 @@
 - 格式：日期 → 主題 → 細項
 
 ## 技術決策紀錄 (Decision Log)
-- 表格形式記錄 | 日期 | 決策 | 理由 | 結果 |
-- AI 在新對話中優先閱讀此區塊
+- 每一筆決策必須包含「最小結構化欄位 (Schema)」確保可維護性：
+  - `Scope`: project / module / infra / security / data / user-pref
+  - `Decision`: 決策內容與方向
+  - `Confidence`: high / medium / low (避免將不確定的 workaround 奉為鐵律)
+  - `Provenance`: 附上原始碼路徑、Commit Hash、或錯誤日誌片段 (確保可追溯)
+  - `Review_after`: (選填) 標註這份決策或 workaround 是否有過期時效限制
+- 表格形式記錄：| Date | Scope | Decision | Confidence | Provenance | Review_after |
+
+## 系統安全與記憶邊界 (Security Boundaries)
+- **永不寫入**：API Keys、存取權杖 (Tokens)、密碼、未脫敏的真實個資。
+- **可寫入**：密鑰雜湊值 (Hash/Fingerprint)、憑證存取的系統變數或路徑 (如 Secret Manager 位置)。
 
 ## 待辦事項 (Roadmap)
 - [ ] 未完成項目
@@ -281,6 +292,12 @@ if __name__ == "__main__":
 alias sys-ask="python /path/to/project/scripts/query.py"
 ```
 
+#### 5. 檢索策略升級建議 (Retrieval Upgrades)
+為了降低無關片段的干擾，強烈建議在生產環境中將 `query.py` 擴充實作以下機制：
+- **混合檢索 (Hybrid Retrieval)**：結合 BM25 (精確關鍵字) 與 Vector (向量語義)，在工程領域中「變數/函式名稱」的關鍵字比對往往比起單純語義更精準。
+- **重排序 (Reranker)**：將初步檢索出的 Top-K 結果套用 Reranker 模型二次交叉比對，大幅減少跨檔案、跨模組時的誤取。
+- **意圖路由 (Query Router)**：根據使用者的搜尋字串判斷 Intent (例如分流為 Debug, Architecture, Ops, Security)，動態路由查閱不同記憶層 (Layer 1~4)。
+
 ---
 
 ## 七、Layer 3 實作：對話摘要索引
@@ -352,13 +369,20 @@ description: 初始化專案記憶與全域感知
 description: 對話結束記憶保存與經驗收斂
 ---
 1. 進行自我反思：盤點本次任務中是否創造了新工具腳本、新解法或經歷了除錯過程 (Phase 4)。
-2. 清理暫存：確保 /tmp 等無用測試資料已被清理移除。
-3. 更新 AGENTS.md：
-   - 將新知與解法濃縮寫入 Decision Log (形成永久習慣)。
+2. 執行記憶重組與過期淘汰 (Memory Reconsolidation & Pruning)：
+   - **Dedup**：合併本次修改與過去相似的決策紀錄。
+   - **Conflict**：若同一個組件發現設定矛盾，以最新解法覆蓋並錄入「Conflict 註記」。
+   - **Decay**：將長期未檢索命中或超過 `Review_after` 的暫時性方案予以降權或歸檔。
+3. 清理暫存：確保 /tmp 等無用測試資料已被清理移除。
+4. 更新 AGENTS.md：
+   - 將新知與解法濃縮，寫入符合最小 Schema (Scope, Confidence 等) 的決策紀錄。
    - Success Log 新增本次完成的工作。
-4. 執行 Git commit + push (注意 Git 衛生，確保 Commit Message 具備描述性)。
-5. 觸發 pre-push hook 即時更新 LanceDB 向量庫，並向使用者確認記憶已持久化。
+5. 執行 Git commit + push (這步驟如果發現機密憑證外洩需觸發預防性阻擋，例如 gitleaks 攔截)。
+6. 觸發 pre-push hook 即時更新 LanceDB 向量庫，並向使用者確認記憶已持久化。
 ```
+
+> 💡 **提示：非 IDE 原生 Agent 隱式映射 (Tool-Agnostic Mapping)**
+> `/start` 與 `/end` 的本質是一個雙向的 **狀態機 (State Machine)**。若您面臨無法使用自動化 `.agents/workflows` 的環境 (如自架機器人、單純網頁端 LLM Chat)，請確保該 Agent 每次接手循環任務時，開場與結尾都硬性通過提示詞強制套用這些步驟，以達成通用相容。
 
 ---
 
@@ -368,8 +392,17 @@ description: 對話結束記憶保存與經驗收斂
 
 ```bash
 #!/bin/bash
-echo "🧠 同步知識庫..."
+echo "🧠 同步知識庫 (增量更新)..."
+
+# 生產環境強烈建議：利用 git diff 計算改動檔名，實作「增量更新 (Incremental Indexing)」，取代全量重建。
 python scripts/ingest.py
+
+# 保護機制：若索引失敗，直接中斷 push，確保程式碼歷史與向量記憶永遠保持絕對同步，避免記憶斷層。
+if [ $? -ne 0 ]; then
+  echo "❌ 知識庫索引失敗！請檢查錯誤或執行 git push --no-verify"
+  exit 1  
+fi
+
 echo "✅ 知識庫已更新"
 ```
 
@@ -392,14 +425,27 @@ echo "✅ 知識庫已更新"
 
 ---
 
-## 十二、注意事項
+## 十三、通用記憶 OS (Unified Memory API)
 
-1. **`.lancedb/` 加入 `.gitignore`**：向量庫是本地的，不需要推送。
-2. **`AGENTS.md` 必須推送**：這是跨環境的核心記憶。
-3. **Embedding Model 選擇**：`all-MiniLM-L6-v2` 輕量快速，適合大多數場景。
-4. **增量索引**：生產環境建議追蹤 mtime/size，避免全量重建。
-5. **多專案共享**：可透過統一的 Memory API 實現跨專案語義檢索。
+當專案擴大，我們期待能跨越單一專案實現「跨代理由統一管理」時，強烈建議將 Layer 1 (AGENTS.md) 實體狀態 與 Layer 2/3 (LanceDB) 向量資料，聯合封裝為一個無差別存取的開放 **Memory API** 規格介面：
+
+**API 規範建議**：
+- `write(memory_item)`: 將符合最低 Schema 結構的單筆決策經驗，正規化並寫回系統。
+- `query(intent, scope, text)`: 不管前端是 Cursor, Windsurf, 還是 CLI，都能藉由 Intent 自動路由提取四層記憶中的高相關性片段。
+- `consolidate()`: 在背景定期對持久層進行 Dedup (去重) 與 Decay (過期淘汰) 維護。
 
 ---
 
-*本指南由 Antigravity AI 生成，基於 Interaction Lab 的實戰經驗。*
+## 十四、系統評測與驗收指標 (Evaluation Benchmarks)
+
+當我們將這套實作從「最佳化規範」升格為「系統工具 OS」時，建議部署量化評測流程，驗證這套記憶架構是否切實減少了系統性錯誤。
+
+- **硬性指標建議**：
+  - **重複犯錯率 (Repeat Error Rate)**：觀測同規格的 Bug 在不同回合對話中是否發生二次出現。
+  - **修復時效 (Time-to-fix & Iteration Count)**：追蹤專案除錯所需的「平均修復迭代次數」，確認記憶生效。
+  - **檢索降噪率 (Irrelevant Retrieval Ratio)**：提取出的 Context Snippet 中，真正在當前任務有用的關聯精準比例。
+- **測試驗證方式**：抽取與回放過去真實專案中發生過的「歷史長段血淚對話紀錄結合 Commit Logs」，引入新 AI Agent 進行盲測 (Replay Test)，觀測其是否因載入該框架與記憶而「免除重蹈覆轍」。
+
+---
+
+*本藍圖由 Interaction Lab 結合了 Antigravity AI 的實戰經驗產出，以解決新世代 AI 開發的協作痛點。*
