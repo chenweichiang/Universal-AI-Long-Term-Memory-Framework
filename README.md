@@ -1,39 +1,136 @@
-# 🧠 Universal AI Long-Term Memory Framework
+# 🧠 Universal AI Long-Term Memory & Dynamic Workflow Blueprint
 
 ---
 
-## I. The Core Problem
-AI Coding Agents have "short-term memory"—each new conversation starts from scratch. This framework uses a four-layer mechanism to let the AI "recall" all past key decisions and work results.
+## I. Core Challenge & Solution
+
+**The Core Challenge: Three Pitfalls for AI Agents**
+While modern AI Coding Agents (e.g., Antigravity, Cursor, Windsurf) possess powerful reasoning capabilities, they frequently fall into three fatal pitfalls when taking over real-world projects:
+1. **Context Fragmentation (Memory Loss)**: Every new conversation starts from scratch, causing the AI to repeatedly suggest flawed decisions, or ignore established security protocols (like backup paths and secrets management).
+2. **Destructive Interference**: AI often fails to distinguish between "Greenfield" and "Existing" projects. When faced with an established codebase, it may blindly apply default templates, redundantly configuring or even breaking stable environments.
+3. **Operational Rigidity**: AI tends to rely on basic, inefficient commands (e.g., standard `pip`, recursive API crawlers) without proactively leveraging modern toolchains (e.g., `uv`, `pytest`, `rclone`, `Docker`) to guarantee speed, isolation, and safety.
+
+**Our Solution: A Holistic Tripartite Framework**
+This blueprint (Universal AI Long-Term Memory & Dynamic Workflow Blueprint) completely abandons the inefficient practice of letting the AI "scan the codebase from scratch". Instead, we built a three-pillar solution:
+- **5-Phase Dynamic Workflow**: Establishes behavioral rules for environment auditing, autonomous planning, and self-healing.
+- **Four-Layer Memory Architecture**: Transforms scattered configs, debugging histories, and massive cloud data into immediately accessible persistent memory.
+- **Modernized Toolchain Standard**: Mandates operational tools to eliminate environmental uncertainties.
+
+Through this framework, any newly assigned AI Agent will instantly possess the holistic perspective, institutional knowledge, and operational discipline of a "Senior Project Maintainer".
 
 ---
 
-## II. Four-Layer Memory Architecture
+## II. Four-Layer Global Memory Architecture
 
+If the toolchain and workflows are the "hands and feet", this four-layer memory system serves as the AI's "brain". Structured from shallow to deep, and local to cloud, it provides four lines of defense to ensure permanent knowledge inheritance:
+
+```text
+┌──────────────────────────────────────────────────────────────────┐
+│  Layer 1: Structured Physical Memory                              │
+│  → Carriers: AGENTS.md, GEMINI.md, config/ (SSoT)                │
+│  → Trigger: Mandatory reading during Phase 1 startup             │
+│  → Purpose: The project's "Constitution" and current state. The   │
+│             highest guideline the AI must read at task startup.   │
+├──────────────────────────────────────────────────────────────────┤
+│  Layer 2: Local Semantic Vector Memory                            │
+│  → Carriers: LanceDB (Serverless) + HuggingFace Embeddings       │
+│  → Trigger: When retrieving cross-file contexts or implementations│
+│  → Purpose: Vectorizes the entire codebase & docs, allowing the   │
+│             AI to perform precision semantic retrieval.          │
+├──────────────────────────────────────────────────────────────────┤
+│  Layer 3: Conversation Experience Digest                          │
+│  → Carriers: Past conversations digested into LanceDB             │
+│  → Trigger: Upon encountering bugs or design hurdles in Phase 2   │
+│  → Purpose: Inherits past debugging journeys, technical decisions │
+│             and failure lessons, preventing repeated mistakes.   │
+├──────────────────────────────────────────────────────────────────┤
+│  Layer 4: Cloud-Native Semantic Memory                            │
+│  → Carriers: LlamaIndex (RAG Core) + Rclone (Fast Tree Filter)   │
+│  → Trigger: When dealing with massive research material on cloud  │
+│  → Purpose: Breaks local disk limits, allowing the AI to dynami-  │
+│             cally access massive knowledge bases on Google Drive. │
+└──────────────────────────────────────────────────────────────────┘
 ```
-┌─────────────────────────────────────────────────┐
-│  Layer 1: Structured File-Based Memory           │
-│  → AGENTS.md / GEMINI.md                         │
-│  → AI prioritizes reading these at the start     │
-├─────────────────────────────────────────────────┤
-│  Layer 2: Semantic Vector Memory                 │
-│  → LanceDB + Embedding Model                     │
-│  → Supports natural language historical retrieval │
-├─────────────────────────────────────────────────┤
-│  Layer 3: Conversation Digest Index              │
-│  → Automatically scans past conversation logs    │
-│  → Indexed into LanceDB for semantic search      │
-├─────────────────────────────────────────────────┤
-│  Layer 4: Cloud-Native Semantic Memory           │
-│  → Google Drive / OneDrive Integration           │
-│  → LlamaIndex + Rclone for high-speed indexing   │
-└─────────────────────────────────────────────────┘
-```
 
 ---
 
-## III. Layer 1: Structured File-Based Memory
+## III. Dynamic Agentic Workflow & Memory Lifecycle
 
-Create an `AGENTS.md` in the project root containing the following sections:
+This framework provides not only static memory but also defines a **Dynamic Reasoning** workflow that AI Agents must follow when taking over a project. The AI should avoid rigid, one-way execution pipelines and autonomously determine when to plan, execute, debug, and memorize, following this five-phase closed loop:
+
+### 0. Phase 0: Environment Audit & Initialization
+- **Trigger**: Upon taking over a project for the first time or before executing a task.
+- **Action**: Before making any substantive changes, the AI must explore the working directory (e.g., using `list_dir`, `view_file`) to determine whether it is a "Greenfield Project" or an "Existing Project".
+  - **Existing Projects**: Actively identify existing development configurations (e.g., `uv.lock`, `.venv`, `docker-compose.yml`) and resource paths. If modernized tools (e.g., `pytest`, `rclone`) or memory carriers (`AGENTS.md`, `.lancedb`) are missing, the AI should perform an "in-place upgrade" to install and supply them. It should also reorganize scattered scripts into standard directories (e.g., `config/`, `scripts/`). **It is strictly forbidden to blindly overwrite or redundantly configure the preexisting environment.**
+  - **Greenfield Projects**: Create the standard directory structure from scratch and initialize the core toolchain (e.g., running `uv init`).
+
+### 1. Phase 1: Context Retrieval & Localization
+- **Trigger**: After completing the environment audit, when officially handling the user's `/start` trigger or a new intent.
+- **Action**: The AI must first rigidly read `AGENTS.md` (rules and state) in the project root, then utilize `sys-ask` to query LanceDB, extracting hard-earned debugging histories and past technical decisions.
+- **Goal**: Superimpose the user's "Historical Habits" onto the "Current Intent" to form an ultra-strong context. This serves as the absolute highest guideline for subsequent execution, thoroughly eliminating blind guesswork.
+
+### 2. Phase 2: Dynamic Planning
+- **Trigger**: After the AI fully comprehends the context.
+- **Action**: The AI evaluates the task's complexity autonomously.
+  - **Low Complexity (Routine)**: Seamlessly transitions to execution to modify code, without strictly requiring a written plan.
+  - **High Complexity / High Risk**: Forces a transition to PLANNING mode. The AI must write a defensive plan (e.g., `implementation_plan.md`) and actively pause execution to **wait for user review and approval before starting work**. Missing configurations or access rights must be requested during this pause.
+  - **Tool Selection & Scripting Strategy**:
+    - **Leverage Mature Open-Source**: Before hard-coding complex logic from scratch, the AI **must** research if a mature tool exists (e.g., checking Awesome Lists, opting for `rclone` instead of writing custom API crawlers).
+    - **When to Write Shell Scripts**: For repetitive system operations (server maintenance, backups, batch cleanups, environment setups) or cron-job deployments, the AI should autonomously encapsulate commands into a Shell Script (`.sh`) and save it to the `scripts/` directory. This ensures reproducibility and version control, strictly avoiding reliance on disposable, one-off terminal commands.
+
+### 3. Phase 3: Self-Healing Execution Loop
+- **Trigger**: Entering the tool operation phase (file modifications, terminal executions).
+- **Action**: After writing code or issuing commands, the AI **must actively trigger Physical Verification**. For example: use `curl -I` for web changes, `docker logs --tail 50` for microservices, or run `pytest` to catch regressions. Never blindly assume code works just by looking at it.
+- **Tool Adjustment & Pivot**: Upon introducing a new tool or script, test it on a minimal scope (Dry-run) first. If version incompatibilities or outdated APIs are discovered, the AI should autonomously search for the latest documentation to adapt. If the adaptation cost is deemed too high, the AI must decisively abandon the tool and pivot to viable alternatives without falling into a rabbit hole.
+- **Self-Healing & Escalation**: If an error (Yellow Light) is encountered, the AI must autonomously read the Log, make adjustments (e.g., using `uv` to install a missing dependency), and retry without immediately disturbing the user. The loop is only aborted to ask the user for help (with a concise Error Log summary) when encountering 3 consecutive failures or an irreversible fatal error (Red Light).
+
+### 4. Phase 4: Evidence Logging & Memory Persistence
+- **Trigger**: Task completion or user inputting `/end`.
+- **Action**: The AI condenses newly invented solutions, critical bugs faced, and hard-earned experiences into text, writing it back to the `AGENTS.md` Decision Log. Active cleanup of temporary files (e.g., scripts in `/tmp`) must also be performed.
+- **Git Hygiene**: Before committing, the AI must check changes using `git status` and `git diff`, and write descriptive Commit Messages. Avoid meaningless monolithic commits.
+- **Automation**: Executing Git Push triggers the `pre-push` hook to call `ingest.py`, permanently etching the latest experience into LanceDB.
+
+---
+
+## IV. Standard AI Development Toolchain
+
+To complement the "Self-Healing mechanisms" and "Verification loops" mentioned above, the AI taking over this framework **must default to the following modernized toolchain**. This ensures execution speed, absolute environment isolation, and operational verifiability:
+
+### 1. Python Environment & Package Management: `uv`
+- **Why use it**: Blazing fast resolution and installation speeds (orders of magnitude faster than traditional `pip`). When the AI performs self-healing in the background (e.g., catching an `ImportError` and installing a missing package), `uv` finishes instantly without blocking the workflow. It also uses `.venv` to ensure absolute project environment isolation.
+- **How to use**:
+  - Environment Initialization: `uv init` / `uv venv`
+  - Install packages: `uv pip install <package>` (instead of `pip install`)
+  - Run scripts: `uv run <script.py>` (automatically uses the virtual environment, no `source` needed)
+
+### 2. Automated Testing Verification: `pytest`
+- **Why use it**: Echoes Phase 3's "Active Verification". After modifying core code, the AI must prove the logic works through automated tests rather than making assumptions. It catches edge cases early and prevents manual debugging loops.
+- **How to use**:
+  - Run tests: `uv run pytest <test_file.py> -v`
+  - Writing tests: For every complex logic change, the AI should proactively write corresponding test cases in the `tests/` directory.
+
+### 3. Cloud Big Data Discovery & Backup: `rclone`
+- **Why use it**: Traditional API recursive crawls (like Google Drive) easily hit Rate Limits or fall into infinite loops (e.g., falsely crawling tens of thousands of `node_modules`). `rclone`'s `--fast-list` and physical `purge` can instantly discover and filter operations on massive file trees. It is the sole designated tool for AI to organize big data and construct Layer 4 (Cloud Memory).
+- **How to use**:
+  - Fast file discovery: `rclone lsjson "remote:path" --fast-list`
+  - Physical deletion: `rclone purge "remote:path/to/garbage"`
+
+### 4. Infrastructure & Microservice Isolation: `Docker`
+- **Why use it**: Ensures absolute parity across development, testing, and production environments. Utilizing `deploy.resources` (CPU/Memory limits) in Compose prevents a single AI tool or service from exhausting host memory, averting system-wide OOM crashes.
+- **How to use**:
+  - Start & update services: `docker compose up -d`
+  - Monitor health: `docker ps` / `docker logs --tail 50 <service_name>`
+
+### 5. Infrastructure as Code (IaC): `Ansible`
+- **Why use it**: Implements automation and version control for multi-host system operations. Whether setting up reverse proxies, service updates, or syncing environment variables, everything should be done via Ansible playbooks to avoid "configuration drift" caused by random SSH modifications.
+- **How to use**:
+  - Execute deployment: `ansible-playbook -i ansible/inventory.ini ansible/playbooks/<service>.yml`
+
+---
+
+## V. Layer 1 Implementation: Structured File-Based Memory
+
+Having understood the workflow and tools, start building project memory by creating `AGENTS.md`.
 
 #### Mandatory Sections
 
@@ -94,7 +191,7 @@ On this foundation, add the **memory-specific sections** of this framework:
 
 ---
 
-## IV. Layer 2: Semantic Vector Memory (LanceDB)
+## VI. Layer 2: Semantic Vector Memory (LanceDB)
 
 #### Why LanceDB?
 
@@ -190,7 +287,7 @@ alias sys-ask="python /path/to/project/scripts/query.py"
 
 ---
 
-## V. Layer 3: Conversation Digest Indexing
+## VII. Layer 3: Conversation Digest Indexing
 
 Build a script to automatically scan the conversation logs directory of your AI IDE and index summaries into LanceDB:
 
@@ -206,7 +303,7 @@ Build a script to automatically scan the conversation logs directory of your AI 
 
 ---
 
-## VI. Layer 4: Cloud-Native Semantic Memory (G-Drive / OneDrive)
+## VIII. Layer 4: Cloud-Native Semantic Memory (G-Drive / OneDrive)
 
 For large-scale research data, local storage is insufficient. Integrate cloud storage providers as a primary knowledge source:
 
@@ -232,41 +329,45 @@ def sync_cloud():
 - Always create a dedicated `AI_Workspace` folder on the cloud for AI-generated data.
 - Generate a markdown inventory (`optimized_inventory.md`) and upload it back to the cloud for easy user review.
 
-#### `/start` Workflow — Context Retrieval & Initialization
+---
 
+## IX. Core Workflows: /start & /end
+
+These two workflows are the essential junctions for the Dynamic Agentic closed-loop (Phases 0-4). They must be materialized as standalone markdown files for the AI to follow.
+
+#### 1. `/start` Workflow — Context Retrieval & Localization
 Create `.agents/workflows/start.md`:
 
 ```markdown
 ---
 description: Initialize project memory and context retrieval
 ---
-1. Read AGENTS.md (Success Log, Decision Log, Roadmap).
-2. Perform multi-dimensional semantic search in LanceDB to extract Historical Habits and past experiences.
-3. Check `git status` for uncommitted changes.
-4. Combine "Historical Habits" with the user's "Current Intent" to autonomously decide whether to enter PLANNING mode or transition directly to EXECUTION. Report readiness to the user.
+1. Environment Audit (Phase 0): Determine if greenfield or existing. Check for necessary modernized tools (e.g., `uv`, `pytest`) and reorganize scattered scripts into standardization.
+2. Read AGENTS.md (Success Log, Decision Log, Roadmap).
+3. Perform multi-dimensional semantic search in LanceDB (`sys-ask`) to extract Historical Habits and past experiences.
+4. Combine "Historical Habits" with the "Current Intent" to autonomously determine whether to enter PLANNING mode or jump to EXECUTION (Phase 1 & 2). 
+5. Report readiness to the user.
 ```
 
-#### `/end` Workflow — Evidence Logging & Persistence
-
+#### 2. `/end` Workflow — Evidence Logging & Persistence
 Create `.agents/workflows/end.md`:
 
 ```markdown
 ---
 description: Conversation end memory persistence and evidence logging
 ---
-1. Self-Reflection: Review if any new solutions were invented or significant bugs were resolved during this session.
-2. Update AGENTS.md:
+1. Self-Reflection: Review if any new shell scripts were created, new solutions invented, or significant bugs resolved during this session (Phase 4).
+2. Clean Workspace: Ensure all temporary rubbish inside `/tmp` is wiped.
+3. Update AGENTS.md:
    - Condense new knowledge and solutions into the Decision Log (forming permanent habits).
    - Add current work to the Success Log.
-   - Update Roadmap status.
-3. Execute conversation digest indexing (conversation_digest.py).
-4. Git commit + push (triggers pre-push hook to permanently update LanceDB vector store).
-5. Confirm memory persistence to the user.
+4. Execute Git commit + push (strictly observe Git hygiene with descriptive Commit Messages).
+5. Trigger the pre-push hook to permanently update the LanceDB vector store, and confirm memory persistence to the user.
 ```
 
 ---
 
-## VII. Git Hook Auto-Sync
+## X. Git Hook Auto-Sync
 
 Create `.git/hooks/pre-push` to automatically update LanceDB on every push:
 
@@ -279,53 +380,11 @@ echo "✅ Knowledge base updated"
 
 ---
 
-## VIII. Dynamic Agentic Workflow & Memory Lifecycle
+## XI. Greenfield Quick Start Checklist
 
-This framework provides not only static memory but also defines a **Dynamic Reasoning** workflow that AI Agents must follow. The AI should avoid rigid, one-way execution pipelines and autonomously determine when to plan, execute, debug, and memorize, following this four-phase closed loop:
+In any greenfield project, have the AI complete these in order (if existing, "Audit and Supply" instead):
 
-### 1. Phase 1: Context Retrieval & Initialization
-- **Trigger**: When the user inputs `/start` or assigns a new project task.
-- **Action**: The AI automatically reads `AGENTS.md` (rules and habits) and uses `sys-ask` to query LanceDB for past experiences.
-- **Goal**: Combine the user's "Historical Habits" with their "Current Intent" as the highest execution guideline, eliminating blind guesswork.
-
-### 2. Phase 2: Dynamic Planning
-- **Trigger**: After the AI fully comprehends the context.
-- **Action**: The AI evaluates the task's complexity autonomously.
-  - **Low Complexity (Routine)**: Seamlessly transitions to execution to modify code, without strictly requiring a written plan.
-  - **High Complexity / High Risk**: Forces a transition to PLANNING mode to write a defensive implementation plan. If crucial configurations or access rights are missing, the AI must actively pause and request instructions from the user.
-
-### 3. Phase 3: Self-Healing Execution Loop
-- **Trigger**: Entering the tool operation phase (file modifications, terminal executions).
-- **Action**: After writing code or issuing commands, the AI **must actively trigger Verification**, such as checking logs or running `curl` tests.
-- **Self-Healing**: If an error (Yellow Light) is encountered, the AI must autonomously read the Log, make adjustments, and retry without immediately disturbing the user. The loop is only aborted to ask the user for help when encountering consecutive failures or an irreversible fatal error (Red Light).
-
-### 4. Phase 4: Evidence Logging & Memory Persistence
-- **Trigger**: Task completion or user inputting `/end`.
-- **Action**: The AI condenses newly invented solutions, critical bugs faced, and hard-earned experiences into text, writing it back to the `AGENTS.md` Decision Log.
-- **Automation**: Executing Git Push triggers the `pre-push` hook to call `ingest.py`, permanently etching the latest experience into LanceDB.
-
-### Workflow Overview Diagram
-
-```text
-User inputs /start (or new task)
-    ↓
-[Phase 1] Read AGENTS.md + Search LanceDB (Awaken Habits & Context)
-    ↓
-[Phase 2] Dynamic Inference of Complexity (Direct Exec / Require Plan)
-    ↓
-[Phase 3] Execution Loop (Tool Calling ↔ Auto-Verify & Self-Heal)
-    ↓
-[Phase 4] Evidence Logging (Write newfound solutions to AGENTS.md)
-    ↓
-User inputs /end + Git push (Trigger permanent LanceDB write) ✅
-```
-
----
-
-## IX. Quick Start Checklist
-
-In any new project, have the AI complete these in order:
-
+- [ ] Initialize project environment with `uv init`
 - [ ] Create `AGENTS.md` (with Persona, Success Log, Decision Log, Roadmap)
 - [ ] Install LanceDB dependencies
 - [ ] Create `scripts/ingest.py` and `scripts/query.py`
@@ -338,7 +397,7 @@ In any new project, have the AI complete these in order:
 
 ---
 
-## X. Important Notes
+## XII. Important Notes
 
 1. **Add `.lancedb/` to `.gitignore`**: The vector store is local and does not need to be pushed.
 2. **`AGENTS.md` must be pushed**: This is the core memory across environments.
