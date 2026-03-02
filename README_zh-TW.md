@@ -152,11 +152,17 @@
   - `Confidence`: high / medium / low (避免將不確定的 workaround 奉為鐵律)
   - `Provenance`: 附上原始碼路徑、Commit Hash、或錯誤日誌片段 (確保可追溯)
   - `Review_after`: (選填) 標註這份決策或 workaround 是否有過期時效限制
-- 表格形式記錄：| Date | Scope | Decision | Confidence | Provenance | Review_after |
+  - `Status`: Active (生效中) / Obsolete (已廢棄) / Experimental (實驗中)
+  - `Conflict_with`: 註記與哪一筆歷史決策產生矛盾 (編號或日期)
+  - `Superseded_by`: 若決策已廢棄，指引至新的決策記錄
+- 表格形式記錄：| Date | Scope | Decision | Confidence | Provenance | Review_after | Status | Conflict_with | Superseded_by |
 
 ## 系統安全與記憶邊界 (Security Boundaries)
 - **永不寫入**：API Keys、存取權杖 (Tokens)、密碼、未脫敏的真實個資。
 - **可寫入**：密鑰雜湊值 (Hash/Fingerprint)、憑證存取的系統變數或路徑 (如 Secret Manager 位置)。
+- **共用記憶存取控制 (Shared Memory Access)**：
+  - 在多 Agent 協作場景，應實施 **RBAC (基於角色的存取控制)**，例如維修 Agent 僅具備作業日誌讀取權限制。
+  - 對於跨專案的共用向量庫，建議在儲存層實施加密 (如整合 Infisical 或加密 LanceDB 檔案)。
 
 ## 待辦事項 (Roadmap)
 - [ ] 未完成項目
@@ -294,8 +300,8 @@ alias sys-ask="python /path/to/project/scripts/query.py"
 
 #### 5. 檢索策略升級建議 (Retrieval Upgrades)
 為了降低無關片段的干擾，強烈建議在生產環境中將 `query.py` 擴充實作以下機制：
-- **混合檢索 (Hybrid Retrieval)**：結合 BM25 (精確關鍵字) 與 Vector (向量語義)，在工程領域中「變數/函式名稱」的關鍵字比對往往比起單純語義更精準。
-- **重排序 (Reranker)**：將初步檢索出的 Top-K 結果套用 Reranker 模型二次交叉比對，大幅減少跨檔案、跨模組時的誤取。
+- **混合檢索 (Hybrid Retrieval)**：結合 BM25 (精確關鍵字) 與 Vector (向量語義)，在工程領域中「變數/函式名稱」的關鍵字比對往往比起單純語義更精準。實行召回分流：向量佔 70%，關鍵字佔 30%。
+- **重排序 (Reranker)**：將初步檢索出的 Top-K 結果套用 Reranker 模型 (如簡單的 BM25 再次打分或 RF 模型) 二次篩選，大幅減少跨檔案、跨模組時的誤取。
 - **意圖路由 (Query Router)**：根據使用者的搜尋字串判斷 Intent (例如分流為 Debug, Architecture, Ops, Security)，動態路由查閱不同記憶層 (Layer 1~4)。
 
 ---
@@ -370,9 +376,10 @@ description: 對話結束記憶保存與經驗收斂
 ---
 1. 進行自我反思：盤點本次任務中是否創造了新工具腳本、新解法或經歷了除錯過程 (Phase 4)。
 2. 執行記憶重組與過期淘汰 (Memory Reconsolidation & Pruning)：
-   - **Dedup**：合併本次修改與過去相似的決策紀錄。
-   - **Conflict**：若同一個組件發現設定矛盾，以最新解法覆蓋並錄入「Conflict 註記」。
-   - **Decay**：將長期未檢索命中或超過 `Review_after` 的暫時性方案予以降權或歸檔。
+   - **版本去重 (Versioning & Dedup)**：合併本次修改與過去相似的決策紀錄，若邏輯相同則更新日期而非新增。
+   - **衝突解決 (Conflict Resolution)**：若同一個組件發現設定矛盾，標註 `Conflict_with` 並以最新解法覆蓋，將舊決策標註為 `Obsolete` 並填入 `Superseded_by`。
+   - **權重調整 (Weighting & Decay)**：根據檢索召回次數 (Recall frequency) 增加權重；將長期未命中或超過 `Review_after` 的暫時性方案降權或歸檔。
+   - **品質過濾**：剔除對話中產生的無效 workaround 或低信心度 (Confidence: low) 且無續航價值的紀錄。
 3. 清理暫存：確保 /tmp 等無用測試資料已被清理移除。
 4. 更新 AGENTS.md：
    - 將新知與解法濃縮，寫入符合最小 Schema (Scope, Confidence 等) 的決策紀錄。
@@ -444,6 +451,8 @@ echo "✅ 知識庫已更新"
   - **重複犯錯率 (Repeat Error Rate)**：觀測同規格的 Bug 在不同回合對話中是否發生二次出現。
   - **修復時效 (Time-to-fix & Iteration Count)**：追蹤專案除錯所需的「平均修復迭代次數」，確認記憶生效。
   - **檢索降噪率 (Irrelevant Retrieval Ratio)**：提取出的 Context Snippet 中，真正在當前任務有用的關聯精準比例。
+  - **記憶庫成熟度 (Memory Maturity)**：統計 Decision Log 中 `Active` 與 `Obsolete` 的比例，以及 `Superseded` 鏈條的完整性。
+  - **召回命中率 (Memory Hit Rate)**：統計 Phase 1 檢索出的資訊中，有多少比例被 Phase 2 的 Plan 採納。
 - **測試驗證方式**：抽取與回放過去真實專案中發生過的「歷史長段血淚對話紀錄結合 Commit Logs」，引入新 AI Agent 進行盲測 (Replay Test)，觀測其是否因載入該框架與記憶而「免除重蹈覆轍」。
 
 ---

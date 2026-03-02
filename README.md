@@ -156,11 +156,17 @@ Having understood the workflow and tools, start building project memory by creat
   - `Confidence`: high / medium / low (prevents treating uncertain workarounds as absolute rules)
   - `Provenance`: Provide source code path, Commit Hash, or error log fragments for traceability
   - `Review_after`: (Optional) Mark if this decision or workaround has an expiration or needs a revisit
-- Table format: | Date | Scope | Decision | Confidence | Provenance | Review_after |
+  - `Status`: Active / Obsolete / Experimental
+  - `Conflict_with`: Note contradictions with a previous decision item (ID or Date)
+  - `Superseded_by`: If the decision is obsolete, redirect to the new decision record
+- Table format: | Date | Scope | Decision | Confidence | Provenance | Review_after | Status | Conflict_with | Superseded_by |
 
 ## System Security & Memory Boundaries
 - **Never write**: API Keys, Tokens, Passwords, unredacted PII (Personally Identifiable Information).
 - **Safe to write**: Hashes/Fingerprints, system variable names, or Vault/Secret Manager paths (e.g., Infisical locations).
+- **Shared Memory Access Control**:
+  - In multi-agent collaboration, implement **RBAC (Role-Based Access Control)**. For example, a maintenance agent may only have read-only access to operational logs.
+  - For cross-project shared vector stores, implement encryption at the storage layer (e.g., via Infisical or encrypted LanceDB storage).
 
 ## Roadmap
 - [ ] In-progress/To-do items
@@ -298,8 +304,8 @@ alias sys-ask="python /path/to/project/scripts/query.py"
 
 #### 5. Retrieval Strategy Upgrades (For Production)
 To reduce noise from irrelevant context, it is highly recommended to extend `query.py` with:
-- **Hybrid Retrieval**: Combine BM25 (exact keyword match) with Vector (semantic match). In engineering, searching for specific exact variable/function names is often more precise than relying on pure semantics.
-- **Reranker**: Apply a cross-encoder reranker model to the initial Top-K results. This drastically reduces false positives when fetching across different modules.
+- **Hybrid Retrieval**: Combine BM25 (exact keyword match) with Vector (semantic match). In engineering, searching for specific exact variable/function names is often more precise than relying on pure semantics. Use a distribution (e.g., 70% Vector, 30% Keyword).
+- **Reranker**: Apply a cross-encoder reranker model (or simple BM25 rescoring / RF models) to the initial Top-K results. This drastically reduces false positives when fetching across different modules.
 - **Query Router**: Dynamically route queries to different memory layers (Layer 1-4) based on the user's intent classification (e.g., Debug, Architecture, Ops, Security).
 
 ---
@@ -375,9 +381,10 @@ description: Conversation end memory persistence and evidence logging
 ---
 1. Self-Reflection: Review if any new shell scripts were created, new solutions invented, or significant bugs resolved during this session (Phase 4).
 2. Memory Reconsolidation & Pruning:
-   - **Dedup**: Merge current modifications with similar past decision records.
-   - **Conflict**: If contradictory configurations are found, overwrite with the latest solution and leave a "Conflict Note".
-   - **Decay**: Archive or downgrade temporary workarounds that haven't been retrieved over a long period or have exceeded their `Review_after` date.
+   - **Versioning & Dedup**: Merge current modifications with similar past decision records. If logic remains identical, update the timestamp instead of creating a new entry.
+   - **Conflict Resolution**: If contradictory configurations are found, mark `Conflict_with`, overwrite with the latest solution, and tag the old record as `Obsolete` with a `Superseded_by` pointer.
+   - **Weighting & Decay**: Increase priority weights based on Retrieval Recall Frequency. Archive or downgrade temporary workarounds that haven't been retrieved over a long period or have exceeded their `Review_after` date.
+   - **Quality Filtering**: Prune invalid workarounds or low-confidence entries (Confidence: low) generated during the session that lack long-term utility.
 3. Clean Workspace: Ensure all temporary rubbish inside `/tmp` is wiped.
 4. Update AGENTS.md:
    - Condense new knowledge and solutions, writing them into the Decision Log following the Minimum Schema (Scope, Confidence, etc.).
@@ -449,6 +456,8 @@ When elevating this implementation from an "Optimization Guide" to a "System OS"
   - **Repeat Error Rate**: Observe whether identical bugs resurface across different conversational turns.
   - **Time-to-fix & Iteration Count**: Track the average number of debugging iterations required to solve an issue, validating if memory is actively assisting.
   - **Irrelevant Retrieval Ratio**: The percentage of accurately helpful Context Snippets extracted versus noise.
+  - **Memory Maturity**: Statistics on the ratio of `Active` vs `Obsolete` entries in the Decision Log, and the integrity of the `Superseded` chain.
+  - **Memory Hit Rate**: Percentage of retrieved context from Layer 1-4 that was actually adopted in the resulting Phase 2 Plan.
 - **Testing Verification Method**: Perform historical replays (Replay Tests) using long, grueling debugging chat logs combined with Commit Logs from real past projects. Introduce a new AI Agent for a blind test to observe if it successfully avoids repeating the same pitfalls simply by inheriting this framework and memory.
 
 ---
