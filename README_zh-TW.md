@@ -125,6 +125,12 @@
 - **怎麼用**：
   - 執行部署：`ansible-playbook -i ansible/inventory.ini ansible/playbooks/<service>.yml`
 
+### 6. 全量測試與實體狀態驗證：`Testinfra` & `Bats`
+- **為什麼用**：這是「全覆蓋測試」的靈魂。`pytest-testinfra` 讓 AI 能用 Python 撰寫測試來驗證伺服器的「最終實體狀態」（如目錄 UID 10000 是否正確），而 `Bats-core` 則負責 Shell 腳本的邏輯單元測試。
+- **怎麼用**：
+  - 運算狀態驗證：`uv run pytest tests/integration/ --hosts=remote-server`
+  - 腳本單元測試：`bats tests/unit/test_script.bats`
+
 ---
 
 ## 五、Layer 1 實作：結構化檔案記憶
@@ -428,10 +434,30 @@ echo "✅ 知識庫已更新"
 - [ ] 建立 `.agents/workflows/start.md` 與 `end.md`
 - [ ] 設定 Git pre-push hook
 - [ ] 設定 Shell 別名 `sys-ask`
-- [ ] 執行首次索引 `python scripts/ingest.py`
 - [ ] 測試 `sys-ask "專案概述"` 確認檢索正常
 
 ---
+
+## 十二、全量覆蓋測試矩陣 (Total Coverage Testing Matrix)
+
+為了確保專案的長期穩定性與「即時驗證」協議的落實，AI 必須建立並維護以下三層測試矩陣：
+
+### 1. Static Layer: 靜態程式碼稽核 (Linting)
+- **工具**：`ShellCheck` (Shell), `Ruff` (Python)。
+- **目標**：在代碼執行前攔截語法錯誤、不安全變數引用與風格偏差。
+
+### 2. Logic Layer: 腳本邏輯單元測試 (Unit Testing)
+- **工具**：`Bats-core` (Shell), `Pytest` (Python)。
+- **實作**：針對核心維護腳本 (如 `watchdog.sh`) 撰寫 Mock 測試，驗證邊界條件下（如網路斷線、磁碟滿載）的邏輯收斂性。
+
+### 3. State Layer: 伺服器最終狀態驗證 (Integration/State)
+- **工具**：`Testinfra` (Pytest 擴充)。
+- **核心價值**：跨越「代碼正確」與「環境正確」的鴻溝。
+- **驗證項目**：
+    - 遠端目錄權限與 UID/GID (如 `uploads` 應歸屬特定容器用戶)。
+    - Docker 容器 Healthcheck 狀態。
+    - 系統服務埠 (Ports) 監聽狀態。
+    - 磁碟空間與系統負載。
 
 ## 十三、通用記憶 OS (Unified Memory API)
 

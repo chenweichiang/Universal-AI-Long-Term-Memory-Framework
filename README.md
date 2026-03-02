@@ -129,6 +129,12 @@ To complement the "Self-Healing mechanisms" and "Verification loops" mentioned a
 - **How to use**:
   - Execute deployment: `ansible-playbook -i ansible/inventory.ini ansible/playbooks/<service>.yml`
 
+### 6. Full Coverage & State Verification: `Testinfra` & `Bats`
+- **Why use it**: The "soul" of total coverage testing. `pytest-testinfra` allows AI to write Python tests to verify the "final physical state" of the server (e.g., verifying if a directory UID is correctly 10000), while `Bats-core` handles unit testing for Shell scripts.
+- **How to use**:
+  - Verify state: `uv run pytest tests/integration/ --hosts=remote-server`
+  - Script unit tests: `bats tests/unit/test_script.bats`
+
 ---
 
 ## V. Layer 1 Implementation: Structured File-Based Memory
@@ -433,10 +439,30 @@ In any greenfield project, have the AI complete these in order (if existing, "Au
 - [ ] Create `.agents/workflows/start.md` and `end.md`
 - [ ] Set up Git pre-push hook
 - [ ] Set up Shell alias `sys-ask`
-- [ ] Run initial indexing `python scripts/ingest.py`
 - [ ] Test `sys-ask "project overview"` to confirm retrieval
 
 ---
+
+## XII. Total Coverage Testing Matrix
+
+To ensure long-term project stability and the realization of the "Immediate Verification" protocol, the AI must establish and maintain the following three-layer testing matrix:
+
+### 1. Static Layer: Static Code Audit (Linting)
+- **Tools**: `ShellCheck` (Shell), `Ruff` (Python).
+- **Goal**: Catch syntax errors, unsafe variable references, and style deviations before execution.
+
+### 2. Logic Layer: Script Unit Testing
+- **Tools**: `Bats-core` (Shell), `Pytest` (Python).
+- **Implementation**: Write Mock tests for core maintenance scripts (e.g., `watchdog.sh`) to verify logical convergence under boundary conditions (e.g., network failure, disk full).
+
+### 3. State Layer: Final Server State Verification (Integration/State)
+- **Tools**: `Testinfra` (Pytest extension).
+- **Core Value**: Bridges the gap between "correct code" and a "correct environment."
+- **Verification Items**:
+    - Remote directory permissions and UID/GID (e.g., `uploads` belonging to a specific container user).
+    - Docker container Healthcheck status.
+    - System service port listening status.
+    - Disk space and system load.
 
 ## XIII. Unified Memory OS (Memory API)
 
