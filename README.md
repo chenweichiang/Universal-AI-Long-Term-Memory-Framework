@@ -2,7 +2,7 @@
 
 [繁體中文](README_zh-TW.md) | [English](README.md)
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-interaction.tw/project__gen-success?style=flat-square)](https://interaction.tw/project_gen/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-project.interaction.tw-success?style=flat-square)](https://project.interaction.tw/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![AGENTS.md Standards](https://img.shields.io/badge/standard-AGENTS.md-blue)](https://agents.md/)
 
@@ -22,7 +22,7 @@ Instead of manually crafting `AGENTS.md` and writing boilerplate Dockerfiles, th
 
 ## 🛠 Usage
 
-1. **Access the Application**: Visit the live deployment at [https://interaction.tw/project_gen/](https://interaction.tw/project_gen/) or clone this repository and run `npm run dev`.
+1. **Access the Application**: Visit the live deployment at [https://project.interaction.tw/](https://project.interaction.tw/) or clone this repository and run `npm run dev`.
 2. **Select Target Scope**: Choose between "Local Only", "Public VPS", or "Full Stack" to narrow down necessary modules.
 3. **Configure Settings**: Select the modules you wish to package into your AI's brain (e.g., Python Tooling, Ansible playbooks, Conversation Digest).
 4. **Download Blueprint**: Hit download, unzip into your new empty project folder.

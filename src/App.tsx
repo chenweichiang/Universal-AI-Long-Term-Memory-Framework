@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import { BrainCircuit, Download, Code2, Server, Database, Github, BookOpen, Layers, AlertCircle, Monitor, Globe, Network, Wrench, ShieldCheck, FolderGit2, UserCircle, Link } from 'lucide-react';
+import { BrainCircuit, Download, Code2, Server, Database, Github, BookOpen, Layers, AlertCircle, Monitor, Globe, Network, Wrench, ShieldCheck, FolderGit2, UserCircle, Link, Library, Home } from 'lucide-react';
 
 const MODULES = [
   {
@@ -328,9 +328,25 @@ function App() {
         {/* Left Sidebar - Options */}
         <div className="col-span-5 flex flex-col gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex items-center gap-3 mb-6">
-              <BrainCircuit className="w-8 h-8 text-blue-600" />
-              <h1 className="text-2xl font-bold tracking-tight">AI Memory OS</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3">
+                <BrainCircuit className="w-8 h-8 text-blue-600" />
+                <h1 className="text-2xl font-bold tracking-tight">AI Memory OS</h1>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <a href="https://interaction.tw/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition-colors">
+                  <Home className="w-3.5 h-3.5" />
+                  Lab Site
+                </a>
+                <a href="https://wiki.interaction.tw/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition-colors">
+                  <Library className="w-3.5 h-3.5" />
+                  Wiki
+                </a>
+                <a href="https://github.com/chenweichiang/AI-memory-os" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition-colors">
+                  <Github className="w-3.5 h-3.5" />
+                  GitHub
+                </a>
+              </div>
             </div>
             <div className="text-sm text-gray-500 mb-6 leading-relaxed">
               A foundation generator designed for AI-assisted development.<br />
